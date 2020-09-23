@@ -72,69 +72,40 @@ class GameLogic:
                 if self._dungeon[i][j] == PLAYER:
                     self._player.set_position((self._dungeon[i], self._dungeon[j]))
                     my_player_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_player_tuple[1] = "Player('O')"
+                    my_player_tuple[1] = self._player
                     entity_position.update(my_player_tuple)
                 elif self._dungeon[i][j] == KEY:
                     my_key_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_key_tuple[1] = "Key('K')"
+                    my_key_tuple[1] = Key()
                     entity_position.update(my_key_tuple)
                 elif self._dungeon[i][j] == DOOR:
                     my_door_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_door_tuple[1] = "Door('D')"
+                    my_door_tuple[1] = Door()
                     entity_position.update(my_door_tuple)
                 elif self._dungeon[i][j] == WALL:
                     my_wall_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_wall_tuple[1] = "Wall('#')"
+                    my_wall_tuple[1] = Wall()
                     entity_position.update(my_wall_tuple)
                 elif self._dungeon[i][j] == MOVE_INCREASE:
                     my_movinc_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_movinc_tuple[1] = "MoveIncrease('M')"
+                    my_movinc_tuple[1] = MoveIncrease()
                     entity_position.update(my_movinc_tuple)
         return entity_position
             
-    def get_player(self):
+    def get_player_position(self):
         player_position = None
         for i in range(len(self._dungeon)):
             for j in range(len(self._dungeon[i])):
-                if (i,j) == "O":
+                if self._dungeon[i][j] == "O":
                     player_position = (i,j)
-            
-                
-                
-                    
         return player_position
     
     def get_game_information(self): 
-        game_info = {}
-        my_wall_tuple = {}
-        my_player_tuple = {}
-        my_movinc_tuple = {}
-        my_key_tuple = {}
-        my_door_tuple = {}
-        entity_position = {}
-        for i in range(len(self._dungeon)):
-            for j in range(len(self._dungeon[i])):
-                if self._dungeon[i][j] == PLAYER:
-                    my_player_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_player_tuple[1] = "Player('O')"
-                    game_info.update(my_player_tuple)
-                elif self._dungeon[i][j] == KEY:
-                    my_key_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_key_tuple[1] = "Key('K')"
-                    game_info.update(my_key_tuple)
-                elif self._dungeon[i][j] == DOOR:
-                    my_door_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_door_tuple[1] = "Door('D')"
-                    game_info.update(my_door_tuple)
-                elif self._dungeon[i][j] == WALL:
-                    my_wall_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_wall_tuple[1] = "Wall('#')"
-                    game_info.update(my_wall_tuple)
-                elif self._dungeon[i][j] == MOVE_INCREASE:
-                    my_movinc_tuple[0] = (self._dungeon[i], self._dungeon[j])
-                    my_movinc_tuple[1] = "MoveIncrease('M')"
-                    game_info.update(my_movinc_tuple)  
-        return game_info
+        return self.init_game_information()
+    
+    def get_player(self):
+        player = self._player
+        return player
         
 
     def get_entity(self, position: tuple):
@@ -143,6 +114,7 @@ class GameLogic:
 
     
     def get_entity_in_direction(self, direction: str):
+        entity_direction = None
         allowed_direction = ["W", "A", "S", "D"]
         if direction in allowed_direction:
             player_position = self._player.get_position()
@@ -157,7 +129,7 @@ class GameLogic:
         if self.get_entity_in_direction() == None:
             return False
         elif direction in allowed_direction:
-            if Player.get_position() + DIRECTIONS.get(direction) == Entity():
+            if (self._player.get_position()[0] + DIRECTIONS.get(direction)[0], self._player.get_position()[1] + DIRECTIONS.get(direction)[1]) == Entity():
                 if Entity.can_collide() == True:
                     return True
                 elif Entity.can_collide() == False:
@@ -166,28 +138,33 @@ class GameLogic:
                 return False 
     
     def new_position(self, direction: str):
-        player_position = Player.get_position() + DIRECTIONS.get(direction)
+        player_position =  (self.get_player_position()[0] + DIRECTIONS.get(direction)[0], self.get_player_position()[1] + DIRECTIONS.get(direction)[1])
         return player_position
     
     def move_player(self, direction: str):
-        Player.set_position((Player.get_position() + DIRECTIONS.get(direction)))
+        players_position = None
+        for key in DIRECTIONS:
+            if key == direction:
+                players_position = self._player.set_position((self.get_player_position()[0] + DIRECTIONS.get(direction)[0], self.get_player_position()[1] + DIRECTIONS.get(direction)[1]))
+        return players_position
 
     def check_game_over(self):
-        if Player.moves_remaining() == 0:
+        if self._player.moves_remaining() == 0:
                 return True
         else:
             return False
         
     def set_win(self, win: bool):
         if win == True:
-            return True
+            game_won = True
         elif win == False:
-            return False
+            game_won = False
         else:
             print("Invalid Command")
+        return game_won
     
     def won(self):
-        return self.set_win()
+        return self.game_won
 
                 
             
@@ -199,6 +176,7 @@ class GameApp:
 
 
     def play(self):
+        
         player_choice = input("Pleae choose a level, game1.txt, game2.txt or game3.txt: ")
         print(player_choice)
         if Player.won() == False:
@@ -442,6 +420,7 @@ class Key(Item):
 
 def main():
     GameApp()
+    
 
 if __name__ == "__main__":
     main()
