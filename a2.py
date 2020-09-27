@@ -141,7 +141,6 @@ class GameLogic:
 
         Output: returns the entity in the direction
         '''
-
         player_current_pos = self._player.player_position
         wanted_pos = (player_current_pos[0] + DIRECTIONS.get(direction)[0], player_current_pos[1] + DIRECTIONS.get(direction)[1])
         return self._game_information.get(wanted_pos)
@@ -160,12 +159,6 @@ class GameLogic:
             return False
         else:
             return True
-        '''
-        if self.get_entity_in_direction(direction) == WALL:
-            return True
-        else:
-            return False
-        '''
 
     def new_position(self, direction: str):
         '''
@@ -270,7 +263,11 @@ class GameApp:
             if option in invest_dict:
                 if(myGameLogic.collision_check(option[-1]) == True):
                     new_pos = myGameLogic.new_position(option[-1])
-                    print(f'{myGameLogic.get_game_information().get(new_pos).__str__()} is on the {option[-1]} side')
+                    print(f'{myGameLogic.get_game_information().get(new_pos).__str__()} is on the {option[-1]} side.')
+                else: 
+                    new_pos = myGameLogic.new_position(option[-1])
+                    print(f'None is on the {option[-1]} side.')
+                
                 myGameLogic.get_player().change_move_count(-1)
 
             elif option in list(DIRECTIONS.keys()):
@@ -309,9 +306,9 @@ class GameApp:
                                
  
                 myGameLogic.get_player().change_move_count(-1)
-                if myGameLogic.check_game_over() == True and myGameLogic.won() == False:
-                    print(LOSE_TEST)
-                    break
+            if myGameLogic.check_game_over() == True and myGameLogic.won() == False:
+                print(LOSE_TEST)
+                break
 
         if myGameLogic.won() == True:
             print(WIN_TEXT)
